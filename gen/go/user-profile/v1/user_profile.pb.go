@@ -391,7 +391,7 @@ type UpdateUserRequest struct {
 	Username      *string                `protobuf:"bytes,2,opt,name=username,proto3,oneof" json:"username,omitempty"`
 	FirstName     *string                `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3,oneof" json:"first_name,omitempty"`
 	LastName      *string                `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3,oneof" json:"last_name,omitempty"`
-	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	Status        *string                `protobuf:"bytes,5,opt,name=status,proto3,oneof" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -455,8 +455,8 @@ func (x *UpdateUserRequest) GetLastName() string {
 }
 
 func (x *UpdateUserRequest) GetStatus() string {
-	if x != nil {
-		return x.Status
+	if x != nil && x.Status != nil {
+		return *x.Status
 	}
 	return ""
 }
@@ -1355,18 +1355,19 @@ const file_user_profile_v1_user_profile_proto_rawDesc = "" +
 	"\vtelegram_id\x18\x01 \x01(\x03R\n" +
 	"telegramId\"<\n" +
 	"\x0fGetUserResponse\x12)\n" +
-	"\x04user\x18\x01 \x01(\v2\x15.user_profile.v1.UserR\x04user\"\xcc\x01\n" +
+	"\x04user\x18\x01 \x01(\v2\x15.user_profile.v1.UserR\x04user\"\xdc\x01\n" +
 	"\x11UpdateUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1f\n" +
 	"\busername\x18\x02 \x01(\tH\x00R\busername\x88\x01\x01\x12\"\n" +
 	"\n" +
 	"first_name\x18\x03 \x01(\tH\x01R\tfirstName\x88\x01\x01\x12 \n" +
-	"\tlast_name\x18\x04 \x01(\tH\x02R\blastName\x88\x01\x01\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\tR\x06statusB\v\n" +
+	"\tlast_name\x18\x04 \x01(\tH\x02R\blastName\x88\x01\x01\x12\x1b\n" +
+	"\x06status\x18\x05 \x01(\tH\x03R\x06status\x88\x01\x01B\v\n" +
 	"\t_usernameB\r\n" +
 	"\v_first_nameB\f\n" +
 	"\n" +
-	"_last_name\"?\n" +
+	"_last_nameB\t\n" +
+	"\a_status\"?\n" +
 	"\x12UpdateUserResponse\x12)\n" +
 	"\x04user\x18\x01 \x01(\v2\x15.user_profile.v1.UserR\x04user\"#\n" +
 	"\x11DeleteUserRequest\x12\x0e\n" +
