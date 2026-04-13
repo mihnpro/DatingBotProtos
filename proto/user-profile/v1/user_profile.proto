@@ -1,0 +1,245 @@
+syntax = "proto3";
+
+package user_profile.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/dating-bot/contracts/gen/go/user_profile/v1;user_profilev1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "User Profile Service API";
+    version: "1.0.0";
+    contact: {
+      name: "Dating Bot Team";
+      url: "https://github.com/dating-bot";
+      email: "";
+    };
+  };
+  host: "localhost:8080";
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// UserService handles user registration, profile, and management
+service UserService {
+  // RegisterUser creates a new user from Telegram registration
+  rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/users/register"
+      body: "*"
+    };
+  }
+
+  // GetUser retrieves user by ID
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/{id}"
+    };
+  }
+
+  // GetUserByTelegramID retrieves user by Telegram ID
+  rpc GetUserByTelegramID(GetUserByTelegramIDRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/telegram/{telegram_id}"
+    };
+  }
+
+  // UpdateUser updates user information
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/users/{id}"
+      body: "*"
+    };
+  }
+
+  // DeleteUser soft deletes a user
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/users/{id}"
+    };
+  }
+
+  // ListUsers returns paginated list of users
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users"
+    };
+  }
+
+  // CreateProfile creates a new profile for a user
+  rpc CreateProfile(CreateProfileRequest) returns (CreateProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profiles"
+      body: "*"
+    };
+  }
+
+  // GetProfile retrieves profile by user ID
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/profiles/{user_id}"
+    };
+  }
+
+  // UpdateProfile updates profile information
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/profiles/{user_id}"
+      body: "*"
+    };
+  }
+
+  // DeleteProfile soft deletes a profile
+  rpc DeleteProfile(DeleteProfileRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/profiles/{user_id}"
+    };
+  }
+
+  // ListProfiles returns paginated list of profiles (for matching)
+  rpc ListProfiles(ListProfilesRequest) returns (ListProfilesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/profiles"
+    };
+  }
+}
+
+// ============ User Messages ============
+
+message User {
+  int64 id = 1;
+  int64 telegram_id = 2;
+  string username = 3;
+  string first_name = 4;
+  string last_name = 5;
+  google.protobuf.Timestamp registered_at = 6;
+  google.protobuf.Timestamp last_active = 7;
+  optional int64 referral_by = 8;
+  string status = 9; // active, deactivated, banned
+}
+
+message RegisterUserRequest {
+  int64 telegram_id = 1;
+  string username = 2;
+  string first_name = 3;
+  string last_name = 4;
+  optional int64 referral_by = 5;
+}
+
+message RegisterUserResponse {
+  User user = 1;
+}
+
+message GetUserRequest {
+  int64 id = 1;
+}
+
+message GetUserByTelegramIDRequest {
+  int64 telegram_id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message UpdateUserRequest {
+  int64 id = 1;
+  optional string username = 2;
+  optional string first_name = 3;
+  optional string last_name = 4;
+  string status = 5;
+}
+
+message UpdateUserResponse {
+  User user = 1;
+}
+
+message DeleteUserRequest {
+  int64 id = 1;
+}
+
+message ListUsersRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  optional string status = 3;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+// ============ Profile Messages ============
+
+message Profile {
+  int64 id = 1;
+  int64 user_id = 2;
+  int32 age = 3;
+  string gender = 4;
+  string city = 5;
+  repeated string interests = 6;
+  int32 photos_count = 7;
+  float fullness_percent = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message CreateProfileRequest {
+  int64 user_id = 1;
+  int32 age = 2;
+  string gender = 3;
+  string city = 4;
+  repeated string interests = 5;
+}
+
+message CreateProfileResponse {
+  Profile profile = 1;
+}
+
+message GetProfileRequest {
+  int64 user_id = 1;
+}
+
+message GetProfileResponse {
+  Profile profile = 1;
+}
+
+message UpdateProfileRequest {
+  int64 user_id = 1;
+  optional int32 age = 2;
+  optional string gender = 3;
+  optional string city = 4;
+  repeated string interests = 5;
+  optional int32 photos_count = 6;
+}
+
+message UpdateProfileResponse {
+  Profile profile = 1;
+}
+
+message DeleteProfileRequest {
+  int64 user_id = 1;
+}
+
+message ListProfilesRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  optional string gender = 3;
+  optional string city = 4;
+  optional int32 min_age = 5;
+  optional int32 max_age = 6;
+}
+
+message ListProfilesResponse {
+  repeated Profile profiles = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
