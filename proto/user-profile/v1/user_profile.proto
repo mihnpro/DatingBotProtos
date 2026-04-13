@@ -153,7 +153,7 @@ message UpdateUserRequest {
   optional string username = 2;
   optional string first_name = 3;
   optional string last_name = 4;
-  string status = 5;
+  optional string status = 5;
 }
 
 message UpdateUserResponse {
