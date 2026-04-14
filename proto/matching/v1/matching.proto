@@ -1,0 +1,185 @@
+syntax = "proto3";
+
+package matching.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/mihnpro/DatingBotProtos/gen/go/matching/v1;matchingv1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Matching Service API";
+    version: "1.0.0";
+    contact: {
+      name: "Dating Bot Team";
+      url: "https://github.com/mihnpro/DatingBotProtos";
+      email: "";
+    };
+  };
+  host: "localhost:8081";
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// MatchingService handles likes, passes, match creation, and match listing
+service MatchingService {
+  // Like sends a like from one user to another
+  rpc Like(LikeRequest) returns (LikeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/matching/like"
+      body: "*"
+    };
+  }
+
+  // Pass sends a pass (dislike/skip) from one user to another
+  rpc Pass(PassRequest) returns (PassResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/matching/pass"
+      body: "*"
+    };
+  }
+
+  // UndoLike removes a like (user changed mind)
+  rpc UndoLike(UndoLikeRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/matching/like/{from_user_id}/{to_user_id}"
+    };
+  }
+
+  // GetMatch retrieves a specific match by ID
+  rpc GetMatch(GetMatchRequest) returns (GetMatchResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/matches/{match_id}"
+    };
+  }
+
+  // GetUserMatches returns all matches for a user
+  rpc GetUserMatches(GetUserMatchesRequest) returns (GetUserMatchesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/matches/user/{user_id}"
+    };
+  }
+
+  // HasMatched checks if two users have a mutual match
+  rpc HasMatched(HasMatchedRequest) returns (HasMatchedResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/matching/check/{user1_id}/{user2_id}"
+    };
+  }
+
+  // GetInteractionHistory returns like/pass history for a user
+  rpc GetInteractionHistory(GetInteractionHistoryRequest) returns (GetInteractionHistoryResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/matching/history/{user_id}"
+    };
+  }
+
+  // MarkConversationStarted marks a match as having started a conversation
+  rpc MarkConversationStarted(MarkConversationStartedRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/matches/{match_id}/conversation-started"
+    };
+  }
+}
+
+// ============ Messages ============
+
+message Match {
+  int64 id = 1;
+  int64 user1_id = 2;
+  int64 user2_id = 3;
+  google.protobuf.Timestamp created_at = 4;
+  string status = 5;            // active, expired, blocked
+  bool conversation_started = 6;
+  google.protobuf.Timestamp last_interaction_at = 7;
+}
+
+message Interaction {
+  int64 id = 1;
+  int64 from_user_id = 2;
+  int64 to_user_id = 3;
+  string type = 4;              // like, pass
+  google.protobuf.Timestamp created_at = 5;
+  int32 time_of_day = 6;        // hour (0-23)
+}
+
+// --- Requests/Responses ---
+
+message LikeRequest {
+  int64 from_user_id = 1;
+  int64 to_user_id = 2;
+}
+
+message LikeResponse {
+  bool is_match = 1;            // true if mutual like → match created
+  optional Match match = 2;     // populated if is_match is true
+  Interaction interaction = 3;
+}
+
+message PassRequest {
+  int64 from_user_id = 1;
+  int64 to_user_id = 2;
+}
+
+message PassResponse {
+  Interaction interaction = 1;
+}
+
+message UndoLikeRequest {
+  int64 from_user_id = 1;
+  int64 to_user_id = 2;
+}
+
+message GetMatchRequest {
+  int64 match_id = 1;
+}
+
+message GetMatchResponse {
+  Match match = 1;
+}
+
+message GetUserMatchesRequest {
+  int64 user_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+  optional string status = 4;   // active, all
+}
+
+message GetUserMatchesResponse {
+  repeated Match matches = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message HasMatchedRequest {
+  int64 user1_id = 1;
+  int64 user2_id = 2;
+}
+
+message HasMatchedResponse {
+  bool matched = 1;
+  optional int64 match_id = 2;
+}
+
+message GetInteractionHistoryRequest {
+  int64 user_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+  optional string type = 4;     // like, pass, all
+}
+
+message GetInteractionHistoryResponse {
+  repeated Interaction interactions = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;}
+
+message MarkConversationStartedRequest {
+  int64 match_id = 1;
+}
