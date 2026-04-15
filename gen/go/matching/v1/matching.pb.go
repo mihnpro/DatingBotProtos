@@ -13,6 +13,7 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -739,7 +740,7 @@ func (x *HasMatchedRequest) GetUser2Id() int64 {
 
 type HasMatchedResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Matched       bool                   `protobuf:"varint,1,opt,name=matched,proto3" json:"matched,omitempty"`
+	Matched       *wrapperspb.BoolValue  `protobuf:"bytes,1,opt,name=matched,proto3" json:"matched,omitempty"`
 	MatchId       *int64                 `protobuf:"varint,2,opt,name=match_id,json=matchId,proto3,oneof" json:"match_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -775,11 +776,11 @@ func (*HasMatchedResponse) Descriptor() ([]byte, []int) {
 	return file_matching_v1_matching_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *HasMatchedResponse) GetMatched() bool {
+func (x *HasMatchedResponse) GetMatched() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.Matched
 	}
-	return false
+	return nil
 }
 
 func (x *HasMatchedResponse) GetMatchId() int64 {
@@ -973,7 +974,7 @@ var File_matching_v1_matching_proto protoreflect.FileDescriptor
 
 const file_matching_v1_matching_proto_rawDesc = "" +
 	"\n" +
-	"\x1amatching/v1/matching.proto\x12\vmatching.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x9f\x02\n" +
+	"\x1amatching/v1/matching.proto\x12\vmatching.v1\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x9f\x02\n" +
 	"\x05Match\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x19\n" +
 	"\buser1_id\x18\x02 \x01(\x03R\auser1Id\x12\x19\n" +
@@ -1033,9 +1034,9 @@ const file_matching_v1_matching_proto_rawDesc = "" +
 	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"I\n" +
 	"\x11HasMatchedRequest\x12\x19\n" +
 	"\buser1_id\x18\x01 \x01(\x03R\auser1Id\x12\x19\n" +
-	"\buser2_id\x18\x02 \x01(\x03R\auser2Id\"[\n" +
-	"\x12HasMatchedResponse\x12\x18\n" +
-	"\amatched\x18\x01 \x01(\bR\amatched\x12\x1e\n" +
+	"\buser2_id\x18\x02 \x01(\x03R\auser2Id\"w\n" +
+	"\x12HasMatchedResponse\x124\n" +
+	"\amatched\x18\x01 \x01(\v2\x1a.google.protobuf.BoolValueR\amatched\x12\x1e\n" +
 	"\bmatch_id\x18\x02 \x01(\x03H\x00R\amatchId\x88\x01\x01B\v\n" +
 	"\t_match_id\"\x8a\x01\n" +
 	"\x1cGetInteractionHistoryRequest\x12\x17\n" +
@@ -1096,7 +1097,8 @@ var file_matching_v1_matching_proto_goTypes = []any{
 	(*GetInteractionHistoryResponse)(nil),  // 14: matching.v1.GetInteractionHistoryResponse
 	(*MarkConversationStartedRequest)(nil), // 15: matching.v1.MarkConversationStartedRequest
 	(*timestamppb.Timestamp)(nil),          // 16: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),                  // 17: google.protobuf.Empty
+	(*wrapperspb.BoolValue)(nil),           // 17: google.protobuf.BoolValue
+	(*emptypb.Empty)(nil),                  // 18: google.protobuf.Empty
 }
 var file_matching_v1_matching_proto_depIdxs = []int32{
 	16, // 0: matching.v1.Match.created_at:type_name -> google.protobuf.Timestamp
@@ -1107,28 +1109,29 @@ var file_matching_v1_matching_proto_depIdxs = []int32{
 	1,  // 5: matching.v1.PassResponse.interaction:type_name -> matching.v1.Interaction
 	0,  // 6: matching.v1.GetMatchResponse.match:type_name -> matching.v1.Match
 	0,  // 7: matching.v1.GetUserMatchesResponse.matches:type_name -> matching.v1.Match
-	1,  // 8: matching.v1.GetInteractionHistoryResponse.interactions:type_name -> matching.v1.Interaction
-	2,  // 9: matching.v1.MatchingService.Like:input_type -> matching.v1.LikeRequest
-	4,  // 10: matching.v1.MatchingService.Pass:input_type -> matching.v1.PassRequest
-	6,  // 11: matching.v1.MatchingService.UndoLike:input_type -> matching.v1.UndoLikeRequest
-	7,  // 12: matching.v1.MatchingService.GetMatch:input_type -> matching.v1.GetMatchRequest
-	9,  // 13: matching.v1.MatchingService.GetUserMatches:input_type -> matching.v1.GetUserMatchesRequest
-	11, // 14: matching.v1.MatchingService.HasMatched:input_type -> matching.v1.HasMatchedRequest
-	13, // 15: matching.v1.MatchingService.GetInteractionHistory:input_type -> matching.v1.GetInteractionHistoryRequest
-	15, // 16: matching.v1.MatchingService.MarkConversationStarted:input_type -> matching.v1.MarkConversationStartedRequest
-	3,  // 17: matching.v1.MatchingService.Like:output_type -> matching.v1.LikeResponse
-	5,  // 18: matching.v1.MatchingService.Pass:output_type -> matching.v1.PassResponse
-	17, // 19: matching.v1.MatchingService.UndoLike:output_type -> google.protobuf.Empty
-	8,  // 20: matching.v1.MatchingService.GetMatch:output_type -> matching.v1.GetMatchResponse
-	10, // 21: matching.v1.MatchingService.GetUserMatches:output_type -> matching.v1.GetUserMatchesResponse
-	12, // 22: matching.v1.MatchingService.HasMatched:output_type -> matching.v1.HasMatchedResponse
-	14, // 23: matching.v1.MatchingService.GetInteractionHistory:output_type -> matching.v1.GetInteractionHistoryResponse
-	17, // 24: matching.v1.MatchingService.MarkConversationStarted:output_type -> google.protobuf.Empty
-	17, // [17:25] is the sub-list for method output_type
-	9,  // [9:17] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	17, // 8: matching.v1.HasMatchedResponse.matched:type_name -> google.protobuf.BoolValue
+	1,  // 9: matching.v1.GetInteractionHistoryResponse.interactions:type_name -> matching.v1.Interaction
+	2,  // 10: matching.v1.MatchingService.Like:input_type -> matching.v1.LikeRequest
+	4,  // 11: matching.v1.MatchingService.Pass:input_type -> matching.v1.PassRequest
+	6,  // 12: matching.v1.MatchingService.UndoLike:input_type -> matching.v1.UndoLikeRequest
+	7,  // 13: matching.v1.MatchingService.GetMatch:input_type -> matching.v1.GetMatchRequest
+	9,  // 14: matching.v1.MatchingService.GetUserMatches:input_type -> matching.v1.GetUserMatchesRequest
+	11, // 15: matching.v1.MatchingService.HasMatched:input_type -> matching.v1.HasMatchedRequest
+	13, // 16: matching.v1.MatchingService.GetInteractionHistory:input_type -> matching.v1.GetInteractionHistoryRequest
+	15, // 17: matching.v1.MatchingService.MarkConversationStarted:input_type -> matching.v1.MarkConversationStartedRequest
+	3,  // 18: matching.v1.MatchingService.Like:output_type -> matching.v1.LikeResponse
+	5,  // 19: matching.v1.MatchingService.Pass:output_type -> matching.v1.PassResponse
+	18, // 20: matching.v1.MatchingService.UndoLike:output_type -> google.protobuf.Empty
+	8,  // 21: matching.v1.MatchingService.GetMatch:output_type -> matching.v1.GetMatchResponse
+	10, // 22: matching.v1.MatchingService.GetUserMatches:output_type -> matching.v1.GetUserMatchesResponse
+	12, // 23: matching.v1.MatchingService.HasMatched:output_type -> matching.v1.HasMatchedResponse
+	14, // 24: matching.v1.MatchingService.GetInteractionHistory:output_type -> matching.v1.GetInteractionHistoryResponse
+	18, // 25: matching.v1.MatchingService.MarkConversationStarted:output_type -> google.protobuf.Empty
+	18, // [18:26] is the sub-list for method output_type
+	10, // [10:18] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_matching_v1_matching_proto_init() }
