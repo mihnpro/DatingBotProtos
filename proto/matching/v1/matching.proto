@@ -6,6 +6,7 @@ import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/mihnpro/DatingBotProtos/gen/go/matching/v1;matchingv1";
 
@@ -94,7 +95,7 @@ message Match {
   int64 user1_id = 2;
   int64 user2_id = 3;
   google.protobuf.Timestamp created_at = 4;
-  string status = 5;            // active, expired, blocked
+  string status = 5; // active, expired, blocked
   bool conversation_started = 6;
   google.protobuf.Timestamp last_interaction_at = 7;
 }
@@ -103,9 +104,9 @@ message Interaction {
   int64 id = 1;
   int64 from_user_id = 2;
   int64 to_user_id = 3;
-  string type = 4;              // like, pass
+  string type = 4; // like, pass
   google.protobuf.Timestamp created_at = 5;
-  int32 time_of_day = 6;        // hour (0-23)
+  int32 time_of_day = 6; // hour (0-23)
 }
 
 // --- Requests/Responses ---
@@ -116,7 +117,7 @@ message LikeRequest {
 }
 
 message LikeResponse {
-  bool is_match = 1;            // true if mutual like → match created
+  bool is_match = 1; // true if mutual like → match created
   optional Match match = 2;     // populated if is_match is true
   Interaction interaction = 3;
 }
@@ -163,7 +164,7 @@ message HasMatchedRequest {
 }
 
 message HasMatchedResponse {
-  bool matched = 1;
+  google.protobuf.BoolValue matched = 1;
   optional int64 match_id = 2;
 }
 
