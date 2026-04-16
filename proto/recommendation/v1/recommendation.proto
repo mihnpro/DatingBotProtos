@@ -1,0 +1,148 @@
+syntax = "proto3";
+
+package recommendation.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/mihnpro/DatingBotProtos/gen/go/recommendation/v1;recommendationv1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Recommendation Service API";
+    version: "1.0.0";
+    contact: {
+      name: "Dating Bot Team";
+      url: "https://github.com/mihnpro/DatingBotProtos";
+      email: "";
+    };
+  };
+  host: "localhost:8082";
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// RecommendationService ranks and serves profile recommendations.
+service RecommendationService {
+
+  // GetNextProfile returns the single next recommended profile for a user.
+  // Backed by a Redis queue; re-fills from ranked DB query when empty.
+  rpc GetNextProfile(GetNextProfileRequest) returns (GetNextProfileResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/recommendations/{user_id}/next"
+    };
+  }
+
+  // GetRecommendations returns a ranked batch of recommended profiles.
+  rpc GetRecommendations(GetRecommendationsRequest) returns (GetRecommendationsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/recommendations/{user_id}"
+    };
+  }
+
+  // GetRating returns the current composite rating for a user.
+  rpc GetRating(GetRatingRequest) returns (GetRatingResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/ratings/{user_id}"
+    };
+  }
+
+  // UpdateRating partially updates the primary or behavioral rating
+  // for a user and recomputes the combined score.
+  rpc UpdateRating(UpdateRatingRequest) returns (UpdateRatingResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/ratings/{user_id}"
+      body: "*"
+    };
+  }
+
+  // TriggerRecalculation enqueues a full rating recalculation for a user.
+  // Processed asynchronously by the background worker pool.
+  rpc TriggerRecalculation(TriggerRecalculationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/ratings/{user_id}/recalculate"
+    };
+  }
+}
+
+// ============ Shared sub-messages ============
+
+// RecommendedProfile is a candidate profile enriched with its ranking score.
+message RecommendedProfile {
+  int64  user_id          = 1;
+  int32  age              = 2;
+  string gender           = 3;
+  string city             = 4;
+  repeated string interests = 5;
+  int32  photos_count     = 6;
+  float  fullness_percent = 7;
+  // Combined ranking score used to sort recommendations (higher = better).
+  double score            = 8;
+}
+
+// Rating stores the three-level composite score for a user.
+message Rating {
+  int64  user_id           = 1;
+  double primary_rating    = 2;   // Level 1 — profile quality score
+  double behavioral_rating = 3;   // Level 2 — interaction behaviour score
+  double combined_rating   = 4;   // Level 3 — weighted combination
+  google.protobuf.Timestamp calculated_at = 5;
+}
+
+// ============ GetNextProfile ============
+
+message GetNextProfileRequest {
+  int64 user_id = 1;
+}
+
+message GetNextProfileResponse {
+  // Populated when has_profile is true.
+  RecommendedProfile profile    = 1;
+  // False when the recommendation queue is empty for this user.
+  bool               has_profile = 2;
+}
+
+// ============ GetRecommendations ============
+
+message GetRecommendationsRequest {
+  int64 user_id = 1;
+  // Maximum number of profiles to return. Defaults to 10.
+  int32 limit   = 2;
+}
+
+message GetRecommendationsResponse {
+  repeated RecommendedProfile profiles = 1;
+}
+
+// ============ GetRating ============
+
+message GetRatingRequest {
+  int64 user_id = 1;
+}
+
+message GetRatingResponse {
+  Rating rating = 1;
+}
+
+// ============ UpdateRating ============
+
+message UpdateRatingRequest {
+  int64 user_id = 1;
+  // If omitted, the existing value is preserved.
+  optional double primary_rating    = 2;
+  optional double behavioral_rating = 3;
+}
+
+message UpdateRatingResponse {
+  Rating rating = 1;
+}
+
+// ============ TriggerRecalculation ============
+
+message TriggerRecalculationRequest {
+  int64 user_id = 1;
+}
